@@ -1,0 +1,140 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Sidebar from "../../components/Sidebar.astro";
+import TabAbout from "../../components/tabs/TabAbout.astro";
+import TabEducation from "../../components/tabs/TabEducation.astro";
+import TabExperience from "../../components/tabs/TabExperience.astro";
+import Footer from "../../components/Footer.astro";
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'vi' } },
+    { params: { lang: 'en' } },
+    { params: { lang: 'ja' } },
+  ];
+}
+const { lang } = Astro.params;
+const initialPageName = "about.js";
+---
+<Layout lang={lang} title={`Viet Khoa | ${initialPageName}`}>
+  <div class="flex flex-col md:flex-row w-full overflow-hidden bg-onedark-bg">
+    
+    <Sidebar lang={lang}/>
+
+    <main class="flex flex-col flex-1 bg-onedark-bg relative min-w-0 w-full h-full">
+      
+      <header class="flex border-b border-onedark-border bg-onedark-surface sticky top-0 z-10 overflow-x-auto no-scrollbar shadow-md">
+        <div class="flex min-w-max md:min-w-0 pl-12 md:pl-0">
+          <button
+            id="btn-tab1"
+            class="tab-btn group relative flex items-center px-4 md:px-6 py-3 text-xs md:text-sm font-mono text-onedark-muted hover:bg-onedark-bg hover:text-white transition-all border-r border-onedark-border min-w-[120px] md:min-w-[140px]"
+            onclick="openTab('tab1')"
+          >
+            <span>about.js</span>
+            <div class="active-indicator absolute bottom-0 left-0 w-full h-0.5 bg-transparent"></div>
+          </button>
+
+          <button
+            id="btn-tab2"
+            class="tab-btn group relative flex items-center px-4 md:px-6 py-3 text-xs md:text-sm font-mono text-onedark-muted hover:bg-onedark-bg hover:text-white transition-all border-r border-onedark-border min-w-[140px] md:min-w-40"
+            onclick="openTab('tab2')"
+          >
+            <span>education.sh</span>
+            <div class="active-indicator absolute bottom-0 left-0 w-full h-0.5 bg-transparent"></div>
+          </button>
+
+          <button
+            id="btn-tab3"
+            class="tab-btn group relative flex items-center px-4 md:px-6 py-3 text-xs md:text-sm font-mono text-onedark-muted hover:bg-onedark-bg hover:text-white transition-all border-r border-onedark-border min-w-[140px] md:min-w-40"
+            onclick="openTab('tab3')"
+          >
+            <span>experience.sql</span>
+            <div class="active-indicator absolute bottom-0 left-0 w-full h-0.5 bg-transparent"></div>
+          </button>
+        </div>
+      </header>
+
+      <div class="flex-1 overflow-y-auto scroll-smooth custom-scrollbar">
+        <div id="tab1" class="tab-content animate-fade-in hidden h-full">
+          <TabAbout lang={lang}/>
+        </div>
+
+        <div id="tab2" class="tab-content animate-fade-in hidden">
+          <TabEducation lang={lang}/>
+        </div>
+
+        <div id="tab3" class="tab-content animate-fade-in hidden">
+          <TabExperience lang={lang}/>
+        </div>
+      </div>
+      
+    </main>
+  </div>
+  <div>
+    <Footer />
+  </div>
+</Layout>
+
+<style is:global>
+  /* hidden horizontal scrollbar*/
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+
+<script is:inline>
+  function openTab(tabId) {
+    const siteName = "Viet Khoa";
+    const titles = {
+      tab1: "about.js",
+      tab2: "education.sh",
+      tab3: "experience.sql",
+    };
+
+    if (titles[tabId]) {
+      document.title = `${siteName} | ${titles[tabId]}`;
+    }
+
+    const contents = document.querySelectorAll(".tab-content");
+    contents.forEach(content => {
+      content.classList.add("hidden");
+      content.classList.remove("block");
+    });
+
+    const buttons = document.querySelectorAll(".tab-btn");
+    buttons.forEach(btn => {
+      btn.classList.remove("bg-onedark-bg", "text-white");
+      btn.classList.add("text-onedark-muted");
+      const indicator = btn.querySelector(".active-indicator");
+      if (indicator) {
+        indicator.classList.remove("bg-primary");
+        indicator.classList.add("bg-transparent");
+      }
+    });
+
+    const activeContent = document.getElementById(tabId);
+    if (activeContent) {
+      activeContent.classList.remove("hidden");
+      activeContent.classList.add("block");
+    }
+
+    const activeBtn = document.getElementById("btn-" + tabId);
+    if (activeBtn) {
+      activeBtn.classList.add("bg-onedark-bg", "text-white");
+      activeBtn.classList.remove("text-onedark-muted");
+      const indicator = activeBtn.querySelector(".active-indicator");
+      if (indicator) {
+        indicator.classList.remove("bg-transparent");
+        indicator.classList.add("bg-primary");
+      }
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    openTab("tab1");
+  });
+</script>

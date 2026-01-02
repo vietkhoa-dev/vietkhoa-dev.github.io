@@ -21,9 +21,9 @@ const optimizedFavicon = await getImage({
     <link rel="icon" href={optimizedFavicon.src} />
     <title>{title}</title>
   </head>
-  <body class="h-screen w-screen flex justify-center items-center p-4 md:p-8">
+  <body class="h-screen w-screen flex justify-center items-center ">
     <main class="w-full max-w-7xl h-full md:h-[90vh] flex flex-col md:flex-row
-                 bg-onedark-bg border border-onedark-border rounded-xl overflow-auto">
+                 bg-onedark-bg border border-onedark-border overflow-auto">
       <slot />
     </main>
   </body>

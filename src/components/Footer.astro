@@ -1,19 +1,30 @@
 ---
-import { profile } from "../data/profile.js";
+// @ts-nocheck
+import { profile } from "../data/data.js";
+
+const { lang = "vi" } = Astro.props;
+const data = profile[lang] || profile.vi;
 ---
 
-<footer class="fixed bg-onedark-bg md:absolute bottom-0 left-0 right-0 w-full text-center py-2">
-  Built with <a
-    href="https://astro.build"
-    title="Astro"
-    target="_blank"
-    class="text-primary hover:underline"
-    >Astro</a
-  > by <a
-    href="#"
-    target="_blank"
-    title="my websile"
-    class="text-primary hover:underline"
-    >{profile.name}</a
-  >
+<footer class="fixed bg-onedark-bg md:absolute bottom-0 left-0 right-0 w-full text-center py-2 border-t border-white/5 font-mono">
+  <div class="text-[11px] text-zinc-500">
+    Built with 
+    <a
+      href="https://astro.build"
+      title="Astro"
+      target="_blank"
+      class="text-primary hover:text-white transition-colors"
+    >
+      Astro
+    </a> 
+    by 
+    <a
+      href={profile.socials.github}
+      target="_blank"
+      title="GitHub Profile"
+      class="text-primary hover:text-white transition-colors underline decoration-dotted underline-offset-4"
+    >
+      {data.name}
+    </a>
+  </div>
 </footer>

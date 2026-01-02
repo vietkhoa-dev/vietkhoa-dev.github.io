@@ -1,97 +1,167 @@
 ---
+// @ts-nocheck
 import { Image } from "astro:assets";
 import ProfilePicture from "../assets/profile.jpg";
-import { profile } from "../data/profile.js";
+import { profile, CONFIG, uiText } from '../data/data.js';
+
+const { lang = 'vi' } = Astro.props;
+const data = profile[lang] || profile.vi;
+const txt = uiText[lang]?.sidebar || uiText.vi.sidebar;
 ---
 
-<aside class="w-full md:w-1/3 lg:w-1/4 bg-black border-r border-white/10 flex flex-col p-3 h-full shadow-2xl font-mono text-white">
+<button id="mobile-toggle" class="md:hidden fixed top-0 left-0 z-[100] bg-black border border-white/20 p-2 rounded text-primary">
+  <i class="fa-solid fa-bars-staggered"></i>
+</button>
+
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[80] hidden md:hidden"></div>
+
+<aside 
+  id="main-sidebar" 
+  class="fixed inset-y-0 left-0 z-[90] w-[280px] -translate-x-full transition-transform duration-300 
+         md:static md:translate-x-0 md:w-1/3 lg:w-1/4 
+         bg-black border-r border-white/10 flex flex-col p-3 h-full shadow-2xl font-mono text-white"
+>
+  <button id="mobile-close" class="md:hidden self-end p-2 text-zinc-500 hover:text-white mb-2">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+
+<div class="mt-4 mb-6 px-3">
+  <div class="flex items-center gap-2 mb-2 text-zinc-500 uppercase tracking-widest text-[9px] font-bold">
+    <i class="fa-solid fa-language text-primary"></i>
+    <span>System Locale (i18n)</span>
+  </div>
   
+  <div class="grid grid-cols-3 gap-1">
+    <a href="/vi/" 
+       class={`flex flex-col items-center py-2 rounded border transition-all ${lang === 'vi' ? 'bg-primary/20 border-primary text-primary' : 'bg-zinc-900/50 border-white/5 text-zinc-500 hover:border-white/20'}`}>
+      <span class="text-[10px] font-bold">VN</span>
+      <span class="text-[8px] opacity-50 uppercase">vi_VN</span>
+    </a>
+    
+    <a href="/en/" 
+       class={`flex flex-col items-center py-2 rounded border transition-all ${lang === 'en' ? 'bg-primary/20 border-primary text-primary' : 'bg-zinc-900/50 border-white/5 text-zinc-500 hover:border-white/20'}`}>
+      <span class="text-[10px] font-bold">EN</span>
+      <span class="text-[8px] opacity-50 uppercase">en_US</span>
+    </a>
+    
+    <a href="/ja/" 
+       class={`flex flex-col items-center py-2 rounded border transition-all ${lang === 'ja' ? 'bg-primary/20 border-primary text-primary' : 'bg-zinc-900/50 border-white/5 text-zinc-500 hover:border-white/20'}`}>
+      <span class="text-[10px] font-bold">JP</span>
+      <span class="text-[8px] opacity-50 uppercase">ja_JP</span>
+    </a>
+  </div>
+</div>
+
   <div class="flex flex-col items-center text-center mb-8 gap-4">
     <div class="w-32 h-32 shrink-0 rounded-full border border-white/10 overflow-hidden p-1 bg-linear-to-b from-white/10 to-transparent shadow-2xl">
       <Image
         src={ProfilePicture}
-        alt={profile.name}
+        alt={data.name || "Profile"}
         class="w-full h-full object-cover rounded-full scale-110 object-top transition-all duration-700"
       />
     </div>
     <div class="space-y-1">
-      <h1 class="text-xl font-bold tracking-tighter uppercase">{profile.name}</h1>
-      <p class="text-primary text-[11px] uppercase font-bold opacity-80">{profile.role}</p>
-      <div class="flex items-center justify-center gap-0.3 text-zinc-500 text-[11px] uppercase">
+      <h1 class="text-xl font-bold tracking-tighter uppercase">{profile.userName || "nvkdevs"}</h1>
+      <p class="text-primary text-[11px] uppercase font-bold opacity-80">{data.role || ""}</p>
+      <div class="flex items-center justify-center gap-1 text-zinc-500 text-[11px] uppercase">
         <i class="fa-solid fa-location-dot text-primary/60"></i>
-        <span>{profile.location}</span>
+        <span>{data.location || ""}</span>
       </div>
       <div class="py-8 border-b border-white/20">
-        <p class="text-zinc-300 text-[13px] font-medium leading-relaxed tracking-tight italic">
-          <span class="text-primary font-bold mr-1">>_</span> Logic là xương sống, sự ổn định là mục tiêu.
+        <p class="text-zinc-300 text-[13px] font-medium leading-relaxed tracking-tight italic px-2">
+          <span class="text-primary font-bold mr-1">>_</span> {txt.quote || ""}
         </p>
       </div>
     </div>
   </div>
 
-  <div class="pb-4 space-y-6">
-  <div class="flex flex-col gap-0">
-    <div class="flex items-center gap-2">
-      <span class="text-red-600 font-bold">#</span>
-      <span class="text-zinc-200 text-[10px] font-bold tracking-tight">sudo systemctl status nvk.profile</span>
-    </div>
-    <div class="text-[10px] text-zinc-600 pl-4">[sudo] password for admin: **********</div>
-  </div>
-
-  <div class="space-y-2 text-[10px]">
+  <div class="pb-4 space-y-6 overflow-y-auto">
     <div class="flex flex-col gap-0">
+      <div class="flex items-center gap-2">
+        <span class="text-red-600 font-bold">#</span>
+        <span class="text-zinc-200 text-[10px] font-bold tracking-tight uppercase">sudo systemctl status {profile.userName || "nvkdevs"}.profile</span>
+      </div>
+      <div class="text-[10px] text-zinc-600 pl-4">[sudo] password for admin: **********</div>
+    </div>
+
+    <div class="space-y-3 text-[10px]">
       <div class="flex justify-between items-center pl-3 border-l-2 border-green-500/50">
-        <span class="text-zinc-500 uppercase tracking-tighter font-bold">Trạng thái:</span>
-        <span class="flex items-center gap-0.5 text-green-500 font-bold">
+        <span class="text-zinc-500 uppercase tracking-tighter font-bold">{txt.labels?.status || "Status:"}</span>
+        <span class="flex items-center gap-1 text-green-500 font-bold">
           <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]"></span>
-          ACTIVE (RUNNING)
+          {txt.status || "ACTIVE"}
         </span>
       </div>
-    </div>
 
-    <div class="flex flex-col gap-0">
-      <span class="text-zinc-600 text-[10px] italic ml-3">// Verified system uptime...</span>
-      <div class="flex justify-between pl-3 border-l-2 border-primary/50">
-        <span class="text-zinc-500 uppercase tracking-tighter font-bold">Kinh nghiệm:</span>
-        <span class="text-white font-bold">{profile.uptime}</span>
+      <div class="flex flex-col gap-0">
+        <span class="text-zinc-600 italic ml-3">{txt.uptimeLog || ""}</span>
+        <div class="flex justify-between pl-3 border-l-2 border-primary/50">
+          <span class="text-zinc-500 uppercase tracking-tighter font-bold">{txt.labels?.exp || "Experience:"}</span>
+          <span id="runtime-uptime" class="text-white font-bold">{data.uptime || ""}</span>
+        </div>
       </div>
-    </div>
 
-    <div class="flex flex-col gap-0">
-      <span class="text-zinc-600 text-[10px] italic ml-3">// Parsing identity_logs...</span>
-      <div class="flex justify-between pl-3 border-l-2 border-white/20">
-        <span class="text-zinc-500 uppercase tracking-tighter font-bold">Quê quán:</span>
-        <span class="text-white font-bold">{profile.hometown}</span>
+      <div class="flex flex-col gap-0">
+        <span class="text-zinc-600 italic ml-3">{txt.identityLog || ""}</span>
+        <div class="flex justify-between pl-3 border-l-2 border-white/20">
+          <span class="text-zinc-500 uppercase tracking-tighter font-bold">{txt.labels?.home || "Hometown:"}</span>
+          <span class="text-white font-bold">{data.hometown || ""}</span>
+        </div>
       </div>
-    </div>
 
-    <div class="p-3 mt-4 bg-zinc-950/50 rounded border border-white/20 shadow-inner">
-      <div class="text-[10px] space-y-1 opacity-80">
-        <p class="text-zinc-400">System is ready for connection.</p>
-        <p class="text-primary animate-pulse tracking-tight font-bold">Waiting for contact request...</p>
+      <div class="p-3 mt-4 bg-zinc-950/50 rounded border border-white/20 shadow-inner">
+        <div class="text-[10px] space-y-1 opacity-80">
+          <p class="text-zinc-400">{txt.systemReady || ""}</p>
+          <p class="text-primary animate-pulse tracking-tight font-bold">{txt.waitingMsg || ""}</p>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="mt-auto space-y-6">
-  <div class="flex justify-between items-center pt-2 transition-opacity">
-    <span class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Kernel:</span>
-    <span class="text-zinc-400 bg-zinc-900 px-1.5 py-0.5 rounded text-[10px] border border-white/20 italic">
-      {profile.kernel}
-    </span>
+  <div class="mt-auto space-y-6">
+    <div class="flex justify-between items-center pt-2">
+      <span class="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">{txt.labels?.kernel || "Kernel:"}</span>
+      <span class="text-zinc-400 bg-zinc-900 px-1.5 py-0.5 rounded text-[10px] border border-white/20 italic">{profile.kernel || ""}</span>
+    </div>
+
+    <div class="pt-3 border-t border-white/20 flex justify-around text-zinc-500 pb-2">
+      <a href={profile.socials?.github || "#"} target="_blank" class="hover:text-white transition-all"><i class="fa-brands fa-github text-xl"></i></a>
+      <a href={profile.socials?.facebook || "#"} target="_blank" class="hover:text-[#1877F2] transition-all"><i class="fa-brands fa-facebook text-xl"></i></a>
+      <a href={profile.socials?.instagram || "#"} target="_blank" class="hover:text-[#E4405F] transition-all"><i class="fa-brands fa-instagram text-xl"></i></a>
+    </div>
   </div>
 
-  <div class="pt-3 border-t border-white/20 flex justify-around text-zinc-500">
-    <a href="https://github.com/vietkhoa-dev/vietkhoa-dev.github.io" target="_blank" class="hover:text-white transition-all hover:scale-125" title="GitHub">
-      <i class="fa-brands fa-github text-xl"></i>
-    </a>
-    <a href="https://www.facebook.com/khoa.nguyen93312" target="_blank" class="hover:text-[#1877F2] transition-all hover:scale-125" title="Facebook">
-      <i class="fa-brands fa-facebook text-xl"></i>
-    </a>
-    <a href="https://www.instagram.com/khoa.nguyen93312" target="_blank" class="hover:text-[#E4405F] transition-all hover:scale-125" title="Instagram">
-      <i class="fa-brands fa-instagram text-xl"></i>
-    </a>
-  </div>
-</div>
+  <script is:inline define:vars={{ CONFIG, lang, txt }}>
+    function initSidebar() {
+      const hydrate = () => {
+        const now = new Date();
+        const unit = txt?.unit || (lang === 'ja' ? ' 年' : ' Năm');
+        const base = now.getFullYear() - (CONFIG?.startYear || 2022);
+        const display = (now.getMonth() + 1) >= 6 ? `${base}.5${unit}` : `${base}${unit}`;
+        const el = document.getElementById('runtime-uptime');
+        if (el) el.textContent = display;
+      };
+      hydrate();
+
+      // Toggle Sidebar Mobile
+      const sidebar = document.getElementById('main-sidebar');
+      const toggle = document.getElementById('mobile-toggle');
+      const close = document.getElementById('mobile-close');
+      const overlay = document.getElementById('sidebar-overlay');
+
+      const handleToggle = () => {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+        document.body.classList.toggle('overflow-hidden');
+      };
+
+      toggle?.addEventListener('click', handleToggle);
+      close?.addEventListener('click', handleToggle);
+      overlay?.addEventListener('click', handleToggle);
+    }
+
+    initSidebar();
+    // Support to View Transitions Astro
+    document.addEventListener('astro:after-swap', initSidebar);
+  </script>
 </aside>

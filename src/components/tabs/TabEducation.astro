@@ -1,96 +1,85 @@
 ---
+// @ts-nocheck
 import { Code } from "astro:components";
+import { profile } from "../../data/data.js";
 
-const educationData = [
-  { year: "2022", school: "Trường Chuyên môn Máy tính ECC", status: "Tốt nghiệp" },
-  { year: "2019", school: "Trường Chuyên môn Ngoại ngữ Quốc tế ECC", status: "Tốt nghiệp" },
-  { year: "2018", school: "Học viện Ngôn ngữ Shin-ai", status: "Tốt nghiệp" },
-  { year: "2015", school: "Học viện Hàng không Việt Nam", status: "Hoàn thành" },
-  { year: "2011", school: "THPT Phan Văn Trị", status: "Tốt nghiệp" },
-];
+const { lang = "vi" } = Astro.props;
+const data = profile[lang] || profile.vi;
+const educationData = data.education || [];
+const eduText = data.eduText || {};
 
-const educationCode = `#!/bin/bash
-
-schools=(
-${educationData.map(item => `  "${item.year} | ${item.school}"`).join("\n")}
-)
-
-function load_profile() {
-  echo "Đang khởi tạo môi trường Linux..."
-  for entry in "\${schools[@]}"; do
-    # Format lại echo để nhìn giống UI hơn
-    year=$(echo $entry | cut -d'|' -f1)
-    name=$(echo $entry | cut -d'|' -f2)
-    echo "[$year] Rendering: $name"
-  done
-}
-
-load_profile`;
+const dollar = "$";
+const educationCode = [
+  "#!/bin/bash",
+  "",
+  "# List of educational institutions",
+  "schools=(",
+  ...educationData.map(item => `  "${item.year || ""} | ${item.school || ""}"`),
+  ")",
+  "",
+  "function render_education() {",
+  `  echo "${eduText.loading || "Initializing..."}"`,
+  `  for entry in "${dollar}{schools[@]}"; do`,
+  `    year=$(echo ${dollar}entry | cut -d'|' -f1)`,
+  `    name=$(echo ${dollar}entry | cut -d'|' -f2)`,
+  `    echo "[${dollar}year] ${eduText.rendering || "Loading:"} ${dollar}name"`,
+  "  done",
+  "}",
+  "",
+  "render_education"
+].join("\n");
 ---
 
-<div class="vscode-container relative min-h-135 m-4 animate-fade-in">
-  <div class="absolute inset-0 z-0 transition-opacity duration-500">
-    <div class="border border-onedark-border rounded-lg bg-onedark-surface h-[85%] overflow-hidden shadow-sm flex flex-col">
-      <div class="bg-black/20 px-4 py-2 text-[10px] text-onedark-muted border-b border-onedark-border flex justify-between">
+<div class="code-container flex flex-col md:relative md:min-h-[650px] m-2 md:m-4 gap-4 md:gap-0 animate-fade-in">
+  
+  <div class="w-full md:absolute md:inset-0 md:z-0 md:h-[85%]">
+    <div class="border border-onedark-border  overflow-hidden shadow-sm flex flex-col h-full">
+      <div class="bg-black/20 px-4 py-2 text-[10px] text-onedark-muted border-b border-onedark-border flex justify-between items-center">
         <span>education.sh</span>
-        <span class="opacity-50">bash</span>
+        <span class="opacity-50 italic hidden md:block uppercase tracking-widest text-[9px]">bash</span>
       </div>
-      <div class="flex-1 overflow-y-auto custom-scrollbar p-2">
-        <Code
-          class="text-sm"
-          code={educationCode}
-          lang="bash"
-          theme="one-dark-pro"
-        />
+      <div class="h-[250px] md:h-full overflow-auto p-4">
+        <Code class="text-xs sm:text-sm" code={educationCode} lang="bash" theme="one-dark-pro" />
       </div>
     </div>
   </div>
 
-  <div class="absolute inset-0 z-10 pointer-events-none flex items-end justify-end p-4 md:p-8 translate-y-30 translate-x-4">
-    <div class="w-full md:w-[60%] shadow-2xl pointer-events-auto transform hover:-translate-y-1 transition-transform">
-      <div class="flex flex-col border border-white/10 rounded-xl overflow-hidden bg-black/90 backdrop-blur-xl">
-        <div class="bg-onedark-surface px-4 py-1 border-b border-white/5 flex justify-between items-center">
-          <span class="text-[10px] text-onedark-muted italic">nvk@linux: ~</span>
-          <div class="flex items-center gap-3">
-            <button class="hover:text-primary transition-colors duration-200">
-              <i class="fa-solid fa-minus text-[10px]"></i>
-            </button>
-            <button class="hover:text-primary transition-colors duration-200">
-              <i class="fa-regular fa-square text-[9px]"></i>
-            </button>
-            <button class="hover:text-red-500 transition-colors duration-200">
-              <i class="fa-solid fa-xmark text-[11px]"></i>
-            </button>
+  <div class="w-full md:absolute md:z-10 md:pointer-events-none md:flex md:items-end md:justify-end md:p-8 md:translate-y-52 md:translate-x-2">
+    <div class="w-full md:w-[70%] shadow-2xl md:pointer-events-auto transform hover:-translate-y-1 transition-transform duration-300">
+      <div class="flex flex-col border border-white/10  overflow-hidden bg-black/95 backdrop-blur-xl">
+        <div class="bg-onedark-surface px-4 py-2 border-b border-white/5 flex justify-between items-center">
+          <span class="text-[10px] text-onedark-muted italic">nvk@osaka-vps: ~</span>
+          <div class="flex gap-1.5">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></div>
           </div>
         </div>
 
-        <div class="p-5 text-xs sm:text-sm leading-relaxed">
-          <p class="text-white mb-5">
-            <span class="text-green-400 font-bold">nvk@linux</span>:<span class="text-primary">~</span>$ ./education.sh
+        <div class="p-5 md:p-6 text-xs leading-relaxed">
+          <p class="text-white mb-4">
+            <span class="text-green-400 font-bold">nvk@osaka</span>:<span class="text-primary">~</span>$ ./education.sh
           </p>
 
-          <div class="space-y-4 max-h-35 overflow-y-auto pr-2 custom-scrollbar">
-            {
-              educationData.map(item => (
-                <div class="flex items-start gap-3 border-l-2 border-green-500/20 pl-3 group">
-                  <span class="text-orange-400 font-bold min-w-11">[{item.year}]</span>
-                  <div>
-                    <p class="text-white font-bold group-hover:text-green-400 transition-colors leading-tight">{item.school}</p>
-                    <p class="text-onedark-muted text-[10px] mt-0.5 italic">{item.status}</p>
-                  </div>
+          <div class="space-y-4 max-h-52 overflow-y-auto pr-2 custom-scrollbar">
+            <p class="text-primary italic">{eduText.loading || ""}</p>
+            {educationData.map(item => (
+              <div class="flex items-start gap-3 border-l-2 border-primary/20 pl-3 group">
+                <span class="text-secondary font-bold min-w-[45px]">[{item.year || ""}]</span>
+                <div>
+                  <p class="text-zinc-100 font-bold group-hover:text-primary transition-colors leading-tight">{item.school || ""}</p>
+                  <p class="text-onedark-muted text-[10px] mt-0.5 italic lowercase">> {item.status || ""}</p>
                 </div>
-              ))
-            }
+              </div>
+            ))}
           </div>
 
-          <div class="mt-8 pt-3 border-t border-white/5 flex items-center justify-between">
+          <div class="mt-6 pt-3 border-t border-white/5 flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="text-green-400 animate-pulse text-xs">➜</span>
-              <p class="text-onedark-muted text-[9px] sm:text-[10px] italic leading-none">System active: OK</p>
+              <span class="text-green-400 animate-pulse">➜</span>
+              <p class="text-onedark-muted text-[9px] uppercase tracking-widest font-bold">{eduText.active || ""}</p>
             </div>
-            <div class="flex items-center gap-3">
-              <i class="fa-brands fa-linux text-base animate-pulse text-onedark-muted text-[24px]"></i>
-            </div>
+            <i class="fa-brands fa-linux text-onedark-muted text-xl opacity-30"></i>
           </div>
         </div>
       </div>

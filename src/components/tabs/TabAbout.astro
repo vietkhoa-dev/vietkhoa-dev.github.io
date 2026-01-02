@@ -1,54 +1,71 @@
 ---
-import { Code } from 'astro:components';
+// @ts-nocheck
+import { Code } from "astro:components";
+import { profile, uiText } from "../../data/data.js";
 
-const jsCode = `/**
- * @file profile.config.js
- * @desc Cấu hình thông tin Kỹ sư Hệ thống
- * @author Nguyen Viet Khoa <Osaka, JP>
- */
+const { lang = "vi" } = Astro.props;
+const data = profile[lang] || profile.vi;
+const txt = uiText[lang] || uiText.vi;
+const comment = txt.tabAbout?.codeComments || {};
 
-// 1. Định nghĩa thông tin cá nhân
-const MY_PROFILE = {
-  name:     "Nguyễn Việt Khoa",
-  role:     "System Engineer | Programmer",
-  location: "Osaka, Nhật Bản 🇯🇵",
-  status:   "HTTP 200 OK (Sẵn sàng làm việc)",
-
-  // Trình độ ngoại ngữ
-  languages: {
-    vi: "Tiếng Việt (Bản ngữ)",
-    ja: "Tiếng Nhật N2 (Giao tiếp / Đọc Design)",
-    en: "Tiếng Anh (Đọc tài liệu kỹ thuật)"
-  }
+const descMap = {
+  vi: "Cấu hình thông tin Kỹ sư Hệ thống",
+  ja: "システム構成設定",
+  en: "System Configuration Profile",
 };
+const description = descMap[lang] || descMap.en;
 
-// 2. Định nghĩa bộ kỹ năng
-const TECH_STACK = {
-  backend:  ["JavaScript", "PHP", "HTML/CSS"],
-  database: ["MySQL", "MariaDB", "Oracle SQL"],
-  system:   ["Linux (CentOS, Ubuntu)", "AWS"],
-  
-  // Kỹ năng đặc thù System Engineer (Dự án Nhật)
-  docs: [
-    "Basic Design (Thiết kế cơ bản)",
-    "DB Schema / ER Diagram (Thiết kế DB)",
-    "Test Specs (PCL / Unit Test)"
-  ],
-  
-  lowcode: ["Intra-mart"],
-  tools: ["Git", "Docker", "VS Code"]
-};
+const dollar = "$";
 
-// 3. Export function (Modern Syntax)
-export const getSystemInfo = () => {
-  return {
-    ...MY_PROFILE, // Spread Operator (ES6)
-    skills: TECH_STACK,
-    message: \`Xin chào! Tôi là \${MY_PROFILE.role}.\` // Xin chào! Tôi là System Engineer | Programmer. 
-  };
-};`;
+const codeLines = [
+  "/**",
+  ` * @file profile.config.js`,
+  ` * @desc ${description}`,
+  ` * @author ${data.name || "nvkdevs"} <${data.location || ""}>`,
+  " */",
+  "",
+  `// ${comment.personal || "1. Personal Information"}`,
+  "const MY_PROFILE = {",
+  `  name:     "${data.name || ""}",`,
+  `  role:     "${data.role || ""}",`,
+  `  location: "${data.location || ""}",`,
+  '  status:   "HTTP 200 OK (Running)",',
+  "",
+  "  languages: {",
+  `    vi: "${data.languages?.vi || ""}",`,
+  `    ja: "${data.languages?.ja || ""}",`,
+  `    en: "${data.languages?.en || ""}"`,
+  "  }",
+  "};",
+  "",
+  `// ${comment.tech || "2. Tech Stack"}`,
+  "const TECH_STACK = {",
+  `  backend:  ${JSON.stringify(data.skills?.backend || [])},`,
+  `  database: ${JSON.stringify(data.skills?.database || [])},`,
+  `  system:   ${JSON.stringify(data.skills?.system || [])},`,
+  `  docs:     ${JSON.stringify(data.skills?.docs || [])},`,
+  '  tools:    ["Git", "Docker", "VS Code"]',
+  "};",
+  "",
+  `// ${comment.method || "3. Export Info"}`,
+  "export const getSystemInfo = () => {",
+  "  return {",
+  `    ...MY_PROFILE, // ${comment.spread || "Spread Operator"}`,
+  "    skills: TECH_STACK,",
+  `    message: \`${comment.message || ""} ${dollar}{MY_PROFILE.role}\``,
+  `    // ${comment.message || ""} ${data.role || ""}`,
+  "  };",
+  "};",
+];
+
+const jsCode = codeLines.join("\n");
 ---
 
-<div class="vscode-container h-full" >
-  <Code code={jsCode} lang="javascript" theme="one-dark-pro" class="text-sm py-6!" />
+<div class="code-container h-full">
+  <Code
+    code={jsCode}
+    lang="javascript"
+    theme="one-dark-pro"
+    class="text-[11px] md:text-sm p-4 md:p-6! line"
+  />
 </div>
